@@ -22,7 +22,7 @@ const login = async(email, password)=> {
     if(!user){
         throw new Error('Credenziali non valide')
     }
-    const isValid= bcrypt.compare(password, user.password)
+    const isValid= await bcrypt.compare(password, user.password)
     if(!isValid){
         throw new Error('Credenziali non valide')    }
 

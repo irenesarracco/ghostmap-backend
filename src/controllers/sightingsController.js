@@ -24,7 +24,8 @@ const getById= async(req, res)=> {
 
 const create = async(req, res)=> {
     try{
-        const insertId= await sightingsService.create(req.body)
+        const insertId= await sightingsService.create({...req.body,
+      user_id: req.userId  })
         const sighting= await sightingsService.getById(insertId)
         res.status(201).json({sighting})
     }
