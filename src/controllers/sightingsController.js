@@ -76,7 +76,8 @@ const createConfirmation = async (req, res) => {
   try {
     const insertId = await sightingsService.createConfirmation({
       ...req.body,
-      sighting_id: req.params.id
+      sighting_id: req.params.id,
+      user_id: req.userId
     })
     res.status(201).json({ data: { id: insertId } })
   } catch (error) {
@@ -98,7 +99,8 @@ const createDebunk = async (req, res) => {
   try {
     const insertId = await sightingsService.createDebunk({
       ...req.body,
-      sighting_id: req.params.id
+      sighting_id: req.params.id,
+      user_id: req.userId
     })
     res.status(201).json({ data: { id: insertId } })
   } catch (error) {
