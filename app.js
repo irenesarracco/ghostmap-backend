@@ -8,6 +8,7 @@ const confirmationsRoutes= require('./src/routes/confirmations')
 const debunksRoutes = require('./src/routes/debunks')
 const usersRoutes = require('./src/routes/users')
 const reportsRoutes = require('./src/routes/reports')
+const mediaRoutes = require('./src/routes/media')
 
 
 const app = express()
@@ -22,6 +23,7 @@ app.use('/api/v1/confirmations', confirmationsRoutes)
 app.use('/api/v1/debunks', debunksRoutes)
 app.use('/api/v1/users', usersRoutes)
 app.use('/api/v1/reports', reportsRoutes)
+app.use('/api/v1/media', mediaRoutes)
 
 
 app.listen(port, () => {

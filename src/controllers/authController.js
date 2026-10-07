@@ -29,4 +29,24 @@ const me= async(req,res)=> {
     }
 }
 
-module.exports = { register, login, me }
+const refresh = async (req, res) => {
+  try {
+    const { refreshToken } = req.body
+    const result = await authService.refresh(refreshToken)
+    res.json({ data: result })
+  } catch (error) {
+    res.status(401).json({ error: { code: 401, message: error.message } })
+  }
+}
+
+const logout = async (req, res) => {
+  try {
+    const { refreshToken } = req.body
+    await authService.logout(refreshToken)
+    res.json({ message: 'Logout effettuato' })
+  } catch (error) {
+    res.status(500).json({ error: { code: 500, message: error.message } })
+  }
+}
+
+module.exports = { register, login, me, refresh, logout }

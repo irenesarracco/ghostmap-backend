@@ -27,14 +27,46 @@ const login = async(email, password)=> {
         throw new Error('Credenziali non valide')    }
 
 
-const token= jwt.sign(
-    {userId: user.id, role: user.role},
+  const accessToken = jwt.sign(
+    { userId: user.id, role: user.role },
     process.env.JWT_SECRET,
-    {expiresIn: process.env.JWT_EXPIRES_IN}
+    { expiresIn: '15m' }
+  )
 
-    )
-    return { token, user: { id: user.id, username: user.username, email: user.email, role: user.role } }
+  const refreshToken = jwt.sign(
+    { userId: user.id },
+    process.env.JWT_SECRET,
+    { expiresIn: '30d' }
+  )
+
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  await db.execute(
+    'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+    [user.id, refreshToken, expiresAt]
+  )
+    return { accessToken, refreshToken, user: { id: user.id, username: user.username, email: user.email, role: user.role } }
+
 }
+
+  const refresh = async (refreshToken) => {
+  const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET)
+
+  const [rows] = await db.execute(
+    'SELECT * FROM refresh_tokens WHERE token = ? AND expires_at > NOW()',
+    [refreshToken]
+  )
+
+  if (!rows[0]) throw new Error('Refresh token non valido')
+
+  const accessToken = jwt.sign(
+    { userId: decoded.userId },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  )
+
+  return { accessToken }
+}  
+
 
 const me = async (userId) => {
   const [rows] = await db.execute(
@@ -44,4 +76,8 @@ const me = async (userId) => {
   return rows[0]
 }
 
-module.exports = { register, login, me }
+const logout = async (refreshToken) => {
+  await db.execute('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken])
+}
+
+module.exports = { register, login, me, refresh, logout }
